@@ -36,7 +36,7 @@
     </head>
 
     <body>
-        <!--
+        <!-- 
         <h1 class="fw-bold text-center">景點觀光展覽資訊</h1>
         <table id="csie" class="table table-striped table-hover">
             <tr>
@@ -46,8 +46,10 @@
             </tr>
         </table>
         -->
+        
         <button onclick="getimg()">Get IMG</button>
         <div id="gallery" class="gallery"></div>
+        
     </body>
     <script>
         /*
@@ -64,6 +66,7 @@
             }
         };
         */
+
         /*
         var openUrl = "https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=1";
         
@@ -75,7 +78,7 @@
             if (this.readyState == 4 && this.status == 200) { 
                 dataset = JSON.parse(this.responseText);
                 addNewData(dataset);
-                console.log('true');
+                console.log(dataset);
             }
         };
 
@@ -90,25 +93,31 @@
         };
         */
 
-
+        
         function getimg() {
-            var dataUrl = 'https://api.unsplash.com/photos?client_id=812193ef71ca946e361ed541979a0cfd91e9419a19235fd05f51ea14233f020a&per_page=2'; 
+            var dataUrl = 'https://api.unsplash.com/photos?client_id=812193ef71ca946e361ed541979a0cfd91e9419a19235fd05f51ea14233f020a&per_page=30'; 
             var xhr = new XMLHttpRequest();
             xhr.open('GET', dataUrl, true);
             xhr.send();
             xhr.onreadystatechange = function() { 
                 if (this.readyState == 4 && this.status == 200) { 
+                    //document.getElementById('gallery').innerHTML = JSON.parse(this.responseText);
                     dataset = JSON.parse(this.responseText);
+                    console.log(dataset);
                     add_new_img(dataset);
-                    //console.log('true');
                 }
             };
-        }
+        };
+
         function add_new_img(dataset) {
             var mydiv = document.getElementById('gallery');
+            
             dataset.forEach(function(data, index){
-                mydiv.appendChild(data);
+                var Img = document.createElement('img');
+                Img.src = data['urls']['raw'];
+                mydiv.appendChild(Img);
             });
-        }
+        };
+        
     </script>
 </html>
