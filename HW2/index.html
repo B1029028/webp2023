@@ -11,9 +11,10 @@
     </head>
     <body>
         <h1 class="fw-bold text-center">景點觀光展覽資訊</h1>
-
-        <input id="search" type="text" class="text-center" onchange="search()">
-
+        <div class="text-center">
+            <p class="fw-bold">關鍵字查詢:</p>
+            <input id="search" type="text" class="text-center" onchange="search()">
+        </div>
         <table id="csie" class="table table-striped table-hover" >
             <tr>
                 <th>名稱</th>
@@ -104,6 +105,7 @@
             displaypage();
             console.log(curpage);
             var page = document.getElementById("curpage").innerHTML = curpage;
+            var keyword = document.getElementById("search").value = null;
         };
 
         function next() {
@@ -112,11 +114,35 @@
             displaypage();
             console.log(curpage);
             var page = document.getElementById("curpage").innerHTML = curpage;
+            var keyword = document.getElementById("search").value = null;
         };
 
         function search() {
-            var keyword = document.getElementById("search");
-            
+            var myTable = document.getElementById("csie");
+            var keyword = document.getElementById("search").value;
+            console.log(keyword.charCodeAt(0));
+            console.log(keyword.length);
+            console.log(myTable.rows[1].cells[0].innerHTML);
+            console.log(myTable.rows[1].cells[0].innerHTML.length);
+            displaypage();
+
+            for (var i = (curpage - 1) * 10 + 1; i < curpage * 10 + 1; i++) {
+                for (var j = 0; j < myTable.rows[i].cells[0].innerHTML.length; j++) {
+                    var k = j;
+                    var l = 0;
+                    while (myTable.rows[i].cells[0].innerHTML[k] == keyword[l]) {
+                        k++;
+                        l++;
+                        console.log(l);
+                    }
+                    if (l == keyword.length) {
+                        myTable.rows[i].style.display = "table-row";
+                        break;
+                    }
+                    else myTable.rows[i].style.display = "none";
+                }
+            }
+            if (keyword.length == 0) displaypage();
         };
     </script>
 </html>
