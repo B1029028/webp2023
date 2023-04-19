@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <style>
+            p{
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="fw-bold text-center">景點觀光展覽資訊</h1>
+        <div class="text-center">
+            <p class="fw-bold">關鍵字查詢:</p>
+            <input id="search" type="text" class="text-center" onchange="search()">
+        </div>
+        <table id="csie" class="table table-striped table-hover" >
+            <tr>
+                <th>名稱</th>
+                <th>地點</th>
+                <th>票價</th>
+            </tr>
+        </table>
+        <div>
+            <input id="previous" type="button" value="上一頁" onclick="previous()">
+            <p id="curpage"></p>
+            <p>/</p>
+            <p id="maxpage"></p>
+            <p>頁</p>
+            <input id="next" type="button" value="下一頁" onclick="next()">
+        </div>
+    </body>
+    <script>
+        /*
+        var openUrl = "https://cloud.culture.tw/frontsite/trans/SearchShowAction.do"
+        
+        var xhr = new XMLHttpRequest();//這
+        xhr.open('GET', openUrl, true);//   三
+        xhr.send();                    //       行基本不變
+
+        xhr.onreadystatechange = function() { //資料改變時呼叫
+            if (this.readyState == 4 && this.status == 200) { //4:連好了 200:ok
+                dataset = JSON.parse(this.responseText); //把server送回的資料解析
+                addNewData(dataset);
+            }
+        };
+        */
+        var openUrl = "https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=1";
+        
+        var xhr = new XMLHttpRequest();
+        var dataset;
+        var rownum = 0;
+        var pagenum = 0;
+        var curpage = 0;
+        var maxpage = document.getElementById("maxpage");
+        fetch(openUrl, {method: 'GET'})
+        .then(res => {
+            return res.text();
+        }).then(result => {
+            dataset = JSON.parse(result);
+            addNewData(dataset);
+            displaypage();
+        })
+        /*
+        xhr.open('GET', openUrl, true);
+        xhr.send();
+
+        xhr.onreadystatechange = function() { 
+            if (this.readyState == 4 && this.status == 200) { 
+                dataset = JSON.parse(this.responseText);
+                addNewData(dataset);
+                console.log('true');
+            }
+            displaypage();
+        };
+        */
+        function addNewData(dataset) {
+            var myTable = document.getElementById("csie");
+            dataset.forEach(function(data, index){
+                var row = myTable.insertRow(-1);
+                row.insertCell(0).innerHTML = data['title'];
+                row.insertCell(1).innerHTML = data['showInfo'][0]['location'];
+                row.insertCell(2).innerHTML = data['showInfo'][0]['price'];
+                rownum += 1
+            });
+            console.log(dataset)
+            if (rownum%10 == 0) pagenum = rownum/10;
+            else pagenum = Math.floor(rownum/10) + 1;
+            console.log(pagenum, rownum);
+            curpage = 1;
+            var page = document.getElementById("curpage").innerHTML = curpage;
+            maxpage.innerHTML = pagenum;
+        };
+
+        function displaypage() {
+            var myTable = document.getElementById("csie");
+
+            myTable.rows[0].style.display = "table-row";
+
+            for (var i = 1; i < (curpage - 1) * 10 + 1; i++) {
+                myTable.rows[i].style.display = "none";
+            }
+
+            for (var i = (curpage - 1) * 10 + 1; i < curpage * 10 + 1; i++) {
+                if(myTable.rows[i]) myTable.rows[i].style.display = "table-row";
+                
+            }
+
+            for (var i = curpage * 10 + 1; i < rownum + 1; i++) {
+                myTable.rows[i].style.display = "none";
+            }
+        };
+
+        function previous() {
+            curpage = curpage - 1;
+            if (curpage < 1) curpage = 1;
+            displaypage();
+            console.log(curpage);
+            var page = document.getElementById("curpage").innerHTML = curpage;
+            var keyword = document.getElementById("search").value = null;
+        };
+
+        function next() {
+            curpage = curpage + 1;
+            if (curpage > maxpage) curpage = maxpage;
+            displaypage();
+            console.log(curpage);
+            var page = document.getElementById("curpage").innerHTML = curpage;
+            var keyword = document.getElementById("search").value = null;
+        };
+
+        function search() {
+            var myTable = document.getElementById("csie");
+            var keyword = document.getElementById("search").value;
+            console.log(keyword.charCodeAt(0));
+            console.log(keyword.length);
+            console.log(myTable.rows[1].cells[0].innerHTML);
+            console.log(myTable.rows[1].cells[0].innerHTML.length);
+            displaypage();
+
+            for (var i = (curpage - 1) * 10 + 1; i < curpage * 10 + 1; i++) {
+                for (var j = 0; j < myTable.rows[i].cells[0].innerHTML.length; j++) {
+                    var k = j;
+                    var l = 0;
+                    while (myTable.rows[i].cells[0].innerHTML[k] == keyword[l]) {
+                        k++;
+                        l++;
+                        console.log(l);
+                    }
+                    if (l == keyword.length) {
+                        myTable.rows[i].style.display = "table-row";
+                        break;
+                    }
+                    else myTable.rows[i].style.display = "none";
+                }
+            }
+            if (keyword.length == 0) displaypage();
+        };
+    </script>
+</html>
